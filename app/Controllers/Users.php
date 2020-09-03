@@ -103,26 +103,26 @@ class Users extends Controller {
             if(is_array($decode)){
                 for($i=0;$i<sizeof($decode);$i++){
                     if($exact == "true"){
+                        // If field is email chack against hash_value for a match.
                         if($field == "email"){
                             if($decode[$i]->{$field} == $this->hash_value($value)){
                             
                                 CLI::write( $decode[$i]->first_name." ".$decode[$i]->last_name, 'green');
                             }else{
-                                CLI::write( 'No match found', 'red');
+                                CLI::write( 'No match found', 'yellow');
                             }
                         }else if($decode[$i]->{$field} == $value){
                             
                             CLI::write( $decode[$i]->first_name." ".$decode[$i]->last_name, 'green');
                         }else{
-                            CLI::write( 'No match found', 'red');
+                            CLI::write( 'No match found', 'yellow');
                         }
                     }else if($exact == "false"){
-                        echo "searching";
                         if(preg_match('/('.$value.')/', $decode[$i]->{$field})){
                             
                             CLI::write( $decode[$i]->first_name." ".$decode[$i]->last_name, 'green');
                         }else{
-                            CLI::write( 'No match found', 'red');
+                            CLI::write( 'No match found', 'yellow');
                         }
                     }
                     
@@ -163,9 +163,11 @@ class Users extends Controller {
             if(is_array($decode)){
                 for($i=0;$i<$numRecords;$i++){
                     if(($i+1) == $numRecords){
+                        // As array is already sorted we can get set the last record
                         $report['full_names'] .= " Record ".$numRecords." ".$decode[$i]->first_name." ".$decode[$i]->last_name;
                         $report['average_age'] += $decode[$i]->age;
                         $report['word_count'] += str_word_count($decode[$i]->about); 
+                        // Check if colour exists and increment or create a new colour
                         if(array_key_exists($decode[$i]->favorite_colour,$favColor)){
                             $favColor[$decode[$i]->favorite_colour]++;
                         }else{
@@ -173,13 +175,16 @@ class Users extends Controller {
                         }
 
                     }else if($i == 0){
+                        // As array is already sorted we can get set the first record
                         $report['full_names'] = "Record 1 ".$decode[$i]->first_name." ".$decode[$i]->last_name;
                         $report['average_age'] = $decode[$i]->age;
                         $report['word_count'] = str_word_count($decode[$i]->about); 
+                        // As this is the first record set the first colour to 1;
                         $favColor[$decode[$i]->favorite_colour] = 1;
                     }else{
                         $report['average_age'] += $decode[$i]->age;
                         $report['word_count'] += str_word_count($decode[$i]->about); 
+                        // Check if colour exists and increment or create a new colour
                         if(array_key_exists($decode[$i]->favorite_colour,$favColor)){
                             $favColor[$decode[$i]->favorite_colour]++;
                         }else{
@@ -190,13 +195,13 @@ class Users extends Controller {
                     
                 }
             }
+            // Get the average age as 2 decimal number. 
             $report['average_age'] = number_format(($report['average_age']/$numRecords),2,'.',',');
-
-            
-
-            
+            // Sort favorite colour so the top most colour is the first key.
             arsort($favColor);
+            // Get the colours as keys 
             $keys = array_keys($favColor);
+            // as array is now sorted use the first key as the favoriate colour
             $report['favorite_colour'] = $keys[0];
 
             // Write users.json file 
