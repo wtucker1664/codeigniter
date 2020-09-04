@@ -6,7 +6,7 @@ then type the following
 
 php index.php users fetchusers
 
-for downloading the users this is a console command
+for running the query this is the console command
 
 php index.php users query "age" "20"
 
