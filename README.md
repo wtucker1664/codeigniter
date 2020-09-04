@@ -27,7 +27,6 @@ SQL statment
 
 I am not sure if I have used the wrong column for the social_score this could be changed.
 
-use feeditback; 
 SELECT distinct companies.`name` as "Company",branches.`name` as "Branch", DATE_FORMAT(survey_responses.visit_datetime,'%m-%y') as "Month", 
 				  (select distinct sum(sr.social_score) from survey_responses as sr where sr.company_id = companies.id and sr.branch_id = branches.id and sr.social_type_id=1 and sr.visit_datetime = survey_responses.visit_datetime) as "TripAdvisor Reviews",
                   (select distinct avg(sr.social_score) from survey_responses as sr where sr.company_id = companies.id and sr.branch_id = branches.id and sr.social_type_id=1 and sr.visit_datetime = survey_responses.visit_datetime) as "TripAdvisor Rating",
