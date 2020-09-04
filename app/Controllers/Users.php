@@ -1,21 +1,19 @@
 <?php namespace App\Controllers;
 
 use CodeIgniter\Controller;
-use CodeIgniter\CLI\CLI;
+
 
 class Users extends Controller {
 
-        private $salt = 'asalt';
+        
 
-        private function hash_value($value)
-        {
-            return crypt(hash('sha256', $value),$this->salt);
-        }
+        
 
         public function fetchusers()
         {
             // Call helper functions
             helper('filesystem');
+            helper('users');
             /*
                 Get API data
             */
@@ -37,7 +35,7 @@ class Users extends Controller {
                 // Itterate over object and apply security.
                 if(is_array($enData)){
                     for($i=0;$i<sizeof($enData);$i++){
-                        $enData[$i]->email = $this->hash_value($enData[$i]->email); 
+                        $enData[$i]->email = hash_value($enData[$i]->email); 
                         unset($enData[$i]->latitude);
                         unset($enData[$i]->longitude);
                         // Astrisk address.
@@ -56,7 +54,7 @@ class Users extends Controller {
                             
                     }
                 }else{
-                    $enData->email = $this->hash_value($enData->email); 
+                    $enData->email = hash_value($enData->email); 
                     unset($enData->latitude);
                     unset($enData->longitude);
                     // Astrisk address.
@@ -92,51 +90,12 @@ class Users extends Controller {
             }
         }
 
-        private function getQuery($field, $value, $exact = "true"){
-            $paths = new \Config\Paths();
-            // set path to writable directory
-            $path = $paths->writableDirectory;
-            // get contents of users.json file.
-            $file = file_get_contents($path."/json/users.json");
-            // decode json string to array/object
-            $decode = json_decode($file);
-            if(is_array($decode)){
-                for($i=0;$i<sizeof($decode);$i++){
-                    if($exact == "true"){
-                        // If field is email chack against hash_value for a match.
-                        if($field == "email"){
-                            if($decode[$i]->{$field} == $this->hash_value($value)){
-                            
-                                CLI::write( $decode[$i]->first_name." ".$decode[$i]->last_name, 'green');
-                            }else{
-                                CLI::write( 'No match found', 'yellow');
-                            }
-                        }else if($decode[$i]->{$field} == $value){
-                            
-                            CLI::write( $decode[$i]->first_name." ".$decode[$i]->last_name, 'green');
-                        }else{
-                            CLI::write( 'No match found', 'yellow');
-                        }
-                    }else if($exact == "false"){
-                        if(preg_match('/('.$value.')/', $decode[$i]->{$field})){
-                            
-                            CLI::write( $decode[$i]->first_name." ".$decode[$i]->last_name, 'green');
-                        }else{
-                            CLI::write( 'No match found', 'yellow');
-                        }
-                    }
-                    
-                }
-            }else{
-                CLI::write( 'Unable to read the file', 'red');
-            }
-        }
-
         public function query($field = "", $value = "", $exact = ""){
+            helper('users');
             if($exact != ""){
-                $this->getQuery($field,$value,$exact);
+                getQuery($field,$value,$exact);
             }else{
-                $this->getQuery($field,$value); 
+                getQuery($field,$value); 
             }
         }
 
